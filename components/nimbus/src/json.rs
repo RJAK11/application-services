@@ -6,6 +6,8 @@ use serde_json::{Map, Value};
 
 use std::collections::HashMap;
 
+use crate::{NimbusError, Result};
+
 #[cfg(feature = "stateful")]
 pub type JsonObject = Map<String, Value>;
 
@@ -85,6 +87,61 @@ fn create_str_replacer<'a>(from: &'a str, to: &'a str) -> impl Fn(&str) -> Optio
             None
         }
     }
+}
+
+pub(crate) fn replace_l10n_in_map(
+    map: &mut Map<String, Value>,
+    translations: &HashMap<String, String>,
+) -> Result<()> {
+    for value in map.values_mut() {
+        replace_l10n(value, translations)?;
+    }
+    Ok(())
+}
+
+fn replace_l10n(value: &mut Value, translations: &HashMap<String, String>) -> Result<()> {
+    match value {
+        Value::Array(list) => {
+            for item in list.iter_mut() {
+                replace_l10n(item, translations)?;
+            }
+        }
+
+        Value::Object(map) => {
+            if let Some(l10n_value) = map.get("$l10n") {
+                let l10n = match l10n_value {
+                    Value::Object(obj) => obj,
+                    _ => {
+                        return Err(NimbusError::LocalizationError(
+                            "Invalid $l10n object".to_string(),
+                        ));
+                    }
+                };
+                let id = match l10n.get("id") {
+                    Some(Value::String(id)) => id,
+                    _ => {
+                        return Err(NimbusError::LocalizationError(
+                            "Missing or invalid $l10n id".to_string(),
+                        ));
+                    }
+                };
+                let text = match translations.get(id) {
+                    Some(text) => text,
+                    _ => {
+                        return Err(NimbusError::LocalizationError(format!(
+                            "Missing translation for {id}"
+                        )));
+                    }
+                };
+                *value = Value::String(text.clone());
+            } else {
+                replace_l10n_in_map(map, translations)?;
+            }
+        }
+
+        _ => (),
+    };
+    Ok(())
 }
 
 #[cfg(test)]
@@ -183,6 +240,52 @@ mod unit_tests {
                     }
                 }
             })
+        );
+    }
+
+    #[test]
+    fn test_replace_l10n() {
+        let mut value = json!({
+            "text": {
+                "$l10n": {
+                    "id": "welcome",
+                    "text": "Welcome!",
+                    "comment": "test comment"
+                }
+            }
+        });
+        let mut translations = HashMap::new();
+        translations.insert(String::from("welcome"), String::from("Bienvenue!"));
+
+        replace_l10n_in_map(value.as_object_mut().unwrap(), &translations).unwrap();
+
+        assert_eq!(value, json!({"text": "Bienvenue!"}));
+    }
+
+    #[test]
+    fn test_replace_l10n_malformed() {
+        let mut translations = HashMap::new();
+        translations.insert(String::from("welcome"), String::from("Bienvenue!"));
+
+        let mut value = json!({"text": {"$l10n": "welcome"}});
+        let result = replace_l10n_in_map(value.as_object_mut().unwrap(), &translations);
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Localization error: Invalid $l10n object"
+        );
+
+        let mut value = json!({"text": {"$l10n": {"text": "Welcome!"}}});
+        let result = replace_l10n_in_map(value.as_object_mut().unwrap(), &translations);
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Localization error: Missing or invalid $l10n id"
+        );
+
+        let mut value = json!({"text": {"$l10n": {"id": "test-missing", "text": "Welcome!"}}});
+        let result = replace_l10n_in_map(value.as_object_mut().unwrap(), &translations);
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Localization error: Missing translation for test-missing"
         );
     }
 }

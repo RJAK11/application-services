@@ -232,6 +232,7 @@ impl NimbusClient {
             &coenrolling_ids,
             self.gecko_prefs.clone(),
             true,
+            state.targeting_attributes.language.as_deref(),
         )?;
         Ok(())
     }
@@ -874,6 +875,7 @@ impl NimbusClient {
             .iter()
             .map(|s| s.as_str())
             .collect();
+        let language = self.get_targeting_attributes().language;
 
         // Registering the Gecko original values does not require a Gecko update,
         // but the cache does need to be refreshed.
@@ -883,6 +885,7 @@ impl NimbusClient {
             &coenrolling_ids,
             self.gecko_prefs.clone(),
             false,
+            language.as_deref(),
         )?;
 
         Ok(())

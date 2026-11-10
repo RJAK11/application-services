@@ -84,6 +84,9 @@ pub enum NimbusError {
     #[error("Error parsing a string into a version {0}")]
     VersionParsingError(String),
 
+    #[error("Localization error: {0}")]
+    LocalizationError(String),
+
     // Stateful errors.
     #[cfg(feature = "stateful")]
     #[error("Behavior error: {0}")]
@@ -201,6 +204,7 @@ impl ErrorCode for NimbusError {
             Self::UrlParsingError(..) => "UrlParsingError".into(),
             Self::UuidError(..) => "UuidError".into(),
             Self::VersionParsingError(..) => "VersionParsingError".into(),
+            Self::LocalizationError(..) => "LocalizationError".into(),
         }
     }
 }

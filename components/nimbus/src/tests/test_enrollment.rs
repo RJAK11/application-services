@@ -1855,6 +1855,7 @@ fn test_evolver_feature_can_have_only_one_experiment() -> Result<()> {
         &enrollments,
         &updated_experiments,
         &no_coenrolling_features(),
+        None,
     );
     assert_eq!(features.len(), 1);
     assert!(features.contains_key("about_welcome"));
@@ -2289,8 +2290,12 @@ fn test_evolver_multi_feature_experiments() -> Result<()> {
         ]
     );
 
-    let feature_map =
-        map_features_by_feature_id(&enrollments, &next_experiments, &no_coenrolling_features());
+    let feature_map = map_features_by_feature_id(
+        &enrollments,
+        &next_experiments,
+        &no_coenrolling_features(),
+        None,
+    );
     assert_eq!(feature_map.len(), 2);
     assert_eq!(
         feature_map.get("about_welcome").unwrap().slug,
@@ -2344,8 +2349,12 @@ fn test_evolver_multi_feature_experiments() -> Result<()> {
         }]
     );
 
-    let feature_map =
-        map_features_by_feature_id(&enrollments, &next_experiments, &no_coenrolling_features());
+    let feature_map = map_features_by_feature_id(
+        &enrollments,
+        &next_experiments,
+        &no_coenrolling_features(),
+        None,
+    );
     assert_eq!(feature_map.len(), 2);
     assert_eq!(
         feature_map.get("about_welcome").unwrap().slug,
@@ -2384,8 +2393,12 @@ fn test_evolver_multi_feature_experiments() -> Result<()> {
         None,
     )?;
 
-    let feature_map =
-        map_features_by_feature_id(&enrollments, &next_experiments, &no_coenrolling_features());
+    let feature_map = map_features_by_feature_id(
+        &enrollments,
+        &next_experiments,
+        &no_coenrolling_features(),
+        None,
+    );
     assert_eq!(feature_map.len(), 1);
     assert!(!feature_map.contains_key("about_welcome"));
     assert_eq!(
@@ -2418,8 +2431,12 @@ fn test_evolver_multi_feature_experiments() -> Result<()> {
         None,
     )?;
 
-    let feature_map =
-        map_features_by_feature_id(&enrollments, &next_experiments, &no_coenrolling_features());
+    let feature_map = map_features_by_feature_id(
+        &enrollments,
+        &next_experiments,
+        &no_coenrolling_features(),
+        None,
+    );
     assert_eq!(feature_map.len(), 2);
     assert_eq!(
         feature_map.get("about_welcome").unwrap().slug,
@@ -2504,8 +2521,12 @@ fn test_evolver_multi_feature_experiments() -> Result<()> {
         None,
     )?;
 
-    let feature_map =
-        map_features_by_feature_id(&enrollments, &next_experiments, &no_coenrolling_features());
+    let feature_map = map_features_by_feature_id(
+        &enrollments,
+        &next_experiments,
+        &no_coenrolling_features(),
+        None,
+    );
     assert_eq!(feature_map.len(), 2);
     assert_eq!(
         feature_map.get("about_welcome").unwrap().slug,
@@ -2562,8 +2583,12 @@ fn test_evolver_multi_feature_experiments() -> Result<()> {
         None,
     )?;
 
-    let feature_map =
-        map_features_by_feature_id(&enrollments, &next_experiments, &no_coenrolling_features());
+    let feature_map = map_features_by_feature_id(
+        &enrollments,
+        &next_experiments,
+        &no_coenrolling_features(),
+        None,
+    );
     assert_eq!(feature_map.len(), 2);
     assert_eq!(
         feature_map.get("about_welcome").unwrap().slug,
@@ -2610,8 +2635,12 @@ fn test_evolver_multi_feature_experiments() -> Result<()> {
         None,
     )?;
 
-    let feature_map =
-        map_features_by_feature_id(&enrollments, &next_experiments, &no_coenrolling_features());
+    let feature_map = map_features_by_feature_id(
+        &enrollments,
+        &next_experiments,
+        &no_coenrolling_features(),
+        None,
+    );
     assert_eq!(feature_map.len(), 3);
     assert_eq!(
         feature_map.get("about_welcome").unwrap().slug,
@@ -2702,7 +2731,7 @@ fn test_map_features_by_feature_id_with_coenrollment() -> Result<()> {
     let ids = HashSet::from(["coenrolling"]);
     let exps = [exp1, exp2, exp3];
 
-    let observed = map_features_by_feature_id(&[], &exps, &ids);
+    let observed = map_features_by_feature_id(&[], &exps, &ids, None);
     let expected = Default::default();
     assert_eq!(observed, expected);
 
@@ -2711,7 +2740,7 @@ fn test_map_features_by_feature_id_with_coenrollment() -> Result<()> {
     let enr3 = ExperimentEnrollment::not_enrolled("exp3");
     let enrollments = [enr1, enr2, enr3];
 
-    let observed = map_features_by_feature_id(&enrollments, &exps, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &exps, &ids, None);
     let expected = Default::default();
     assert_eq!(observed, expected);
 
@@ -2720,7 +2749,7 @@ fn test_map_features_by_feature_id_with_coenrollment() -> Result<()> {
     let enr3 = ExperimentEnrollment::not_enrolled("exp3");
     let enrollments = [enr1, enr2, enr3];
 
-    let observed = map_features_by_feature_id(&enrollments, &exps, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &exps, &ids, None);
     let expected = HashMap::from([(
         "colliding".to_string(),
         EnrolledFeatureConfig::new("colliding", json!({"x": 1 }), "exp1", Some("control")),
@@ -2732,7 +2761,7 @@ fn test_map_features_by_feature_id_with_coenrollment() -> Result<()> {
     let enr3 = ExperimentEnrollment::not_enrolled("exp3");
     let enrollments = [enr1, enr2, enr3];
 
-    let observed = map_features_by_feature_id(&enrollments, &exps, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &exps, &ids, None);
     let expected = HashMap::from([
         (
             "colliding".to_string(),
@@ -2755,7 +2784,7 @@ fn test_map_features_by_feature_id_with_coenrollment() -> Result<()> {
     let enr3 = ExperimentEnrollment::enrolled("exp3");
     let enrollments = [enr1, enr2, enr3];
 
-    let observed = map_features_by_feature_id(&enrollments, &exps, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &exps, &ids, None);
     let expected = HashMap::from([
         (
             "colliding".to_string(),
@@ -2805,7 +2834,7 @@ fn test_map_features_by_feature_id_with_coenrolling_multifeature() -> Result<()>
     let enr3 = ExperimentEnrollment::not_enrolled("exp3");
     let enrollments = [enr1, enr2, enr3];
 
-    let observed = map_features_by_feature_id(&enrollments, &exps, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &exps, &ids, None);
     let expected = HashMap::from([
         (
             "colliding1".to_string(),
@@ -2828,7 +2857,7 @@ fn test_map_features_by_feature_id_with_coenrolling_multifeature() -> Result<()>
     let enr3 = ExperimentEnrollment::not_enrolled("exp3");
     let enrollments = [enr1, enr2, enr3];
 
-    let observed = map_features_by_feature_id(&enrollments, &exps, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &exps, &ids, None);
     let expected = HashMap::from([
         (
             "colliding1".to_string(),
@@ -2855,7 +2884,7 @@ fn test_map_features_by_feature_id_with_coenrolling_multifeature() -> Result<()>
     let enr3 = ExperimentEnrollment::enrolled("exp3");
     let enrollments = [enr1, enr2, enr3];
 
-    let observed = map_features_by_feature_id(&enrollments, &exps, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &exps, &ids, None);
     let expected = HashMap::from([
         (
             "colliding1".to_string(),
@@ -2910,7 +2939,7 @@ fn test_evolve_enrollments_with_coenrolling_features() -> Result<()> {
         None,
     )?;
 
-    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids, None);
     let expected = HashMap::from([
         (
             "colliding".to_string(),
@@ -2976,7 +3005,7 @@ fn test_evolve_enrollments_with_coenrolling_features() -> Result<()> {
         None,
     )?;
 
-    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids, None);
     let expected = HashMap::from([
         (
             "colliding".to_string(),
@@ -3070,7 +3099,7 @@ fn test_evolve_enrollments_with_coenrolling_multi_features() -> Result<()> {
         None,
     )?;
 
-    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids, None);
     let expected = HashMap::from([
         (
             "colliding".to_string(),
@@ -3142,7 +3171,7 @@ fn test_evolve_enrollments_with_coenrolling_multi_features() -> Result<()> {
         None,
     )?;
 
-    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids, None);
     let expected = HashMap::from([
         (
             "colliding".to_string(),
@@ -3241,7 +3270,7 @@ fn test_map_features_by_feature_id_with_slug_replacement() -> Result<()> {
     let enr3 = ExperimentEnrollment::enrolled("exp3");
     let enrs = [enr1, enr2, enr3];
 
-    let observed = map_features_by_feature_id(&enrs, &exps, &ids);
+    let observed = map_features_by_feature_id(&enrs, &exps, &ids, None);
     let expected = HashMap::from([
         (
             "colliding".to_string(),
@@ -4123,7 +4152,8 @@ fn test_evolver_map_features_by_feature_id_merges_rollouts() -> Result<()> {
     };
     let enrollments = &[ro_enrollment, exp_enrollment];
     let experiments = &[experiment, rollout];
-    let features = map_features_by_feature_id(enrollments, experiments, &no_coenrolling_features());
+    let features =
+        map_features_by_feature_id(enrollments, experiments, &no_coenrolling_features(), None);
 
     assert_alice_bob_charlie(&features);
     Ok(())
@@ -4168,7 +4198,8 @@ fn test_rollouts_end_to_end() -> Result<()> {
         ]
     );
 
-    let features = map_features_by_feature_id(&enrollments, recipes, &no_coenrolling_features());
+    let features =
+        map_features_by_feature_id(&enrollments, recipes, &no_coenrolling_features(), None);
 
     assert_alice_bob_charlie(&features);
 
@@ -4475,7 +4506,7 @@ fn test_evolve_enrollments_ordering() -> Result<()> {
         None,
     )?;
 
-    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids);
+    let observed = map_features_by_feature_id(&enrollments, &all_experiments, &ids, None);
     let expected = HashMap::from([(
         "colliding-feature".to_string(),
         EnrolledFeatureConfig::new(

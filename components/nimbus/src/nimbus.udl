@@ -224,7 +224,7 @@ enum NimbusError {
     "InvalidPath", "InternalError", "NoSuchExperiment", "NoSuchBranch",
     "DatabaseNotReady", "VersionParsingError", "BehaviorError", "TryFromIntError",
     "ParseIntError", "TransformParameterError", "ClientError", "UniFFICallbackError",
-    "RegexError",
+    "RegexError", "LocalizationError",
 };
 
 [Custom]

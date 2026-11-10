@@ -20,6 +20,7 @@
 ### Nimbus
 
 - Several FML lints were removed. ([#7730](https://github.com/mozilla/application-services/pull/7730))
+- Nimbus can now localize feature values, so strings written as `$l10n` objects are replaced with the translation for the client's language (e.g. `fr` for `fr-CA`) from the experiment's `localizations`. A client is not enrolled, or is disqualified, when its language or a needed translation is missing. ([Bug 2079398](https://bugzilla.mozilla.org/show_bug.cgi?id=2079398))
 
 ### Remote Settings
 
